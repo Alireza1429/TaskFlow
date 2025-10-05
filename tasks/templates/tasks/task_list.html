@@ -1,0 +1,94 @@
+{% extends 'tasks/base.html' %}
+
+{% block content %}
+<div class="row">
+  <div class="col-md-8">
+    <h3>لیست وظایف</h3>
+  </div>
+  <div class="col-md-4 text-end">
+    <form method="get" class="row g-2">
+      <div class="col-auto">
+        <select name="status" class="form-select">
+          <option value="">همه وضعیت‌ها</option>
+          <option value="todo" {% if filter_status == "todo" %}selected{% endif %}>انجام نشده</option>
+          <option value="doing" {% if filter_status == "doing" %}selected{% endif %}>در حال انجام</option>
+          <option value="done" {% if filter_status == "done" %}selected{% endif %}>انجام شده</option>
+        </select>
+      </div>
+
+      <div class="col-auto">
+        <select name="priority" class="form-select">
+          <option value="">همه اولویت‌ها</option>
+          <option value="high" {% if filter_priority == "high" %}selected{% endif %}>بالا</option>
+          <option value="medium" {% if filter_priority == "medium" %}selected{% endif %}>متوسط</option>
+          <option value="low" {% if filter_priority == "low" %}selected{% endif %}>کم</option>
+        </select>
+      </div>
+
+      <div class="col-auto">
+        <select name="order" class="form-select">
+          <option value="">مرتب‌سازی</option>
+          <option value="due" {% if order == "due" %}selected{% endif %}>بر اساس تاریخ سررسید</option>
+          <option value="priority" {% if order == "priority" %}selected{% endif %}>بر اساس اولویت</option>
+        </select>
+      </div>
+
+      <div class="col-auto">
+        <button class="btn btn-outline-secondary">اعمال</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+{% if due_soon %}
+  <div class="alert alert-warning mt-3">
+    برخی وظایف سررسید نزدیک دارند!
+  </div>
+{% endif %}
+
+<table class="table table-striped mt-3">
+  <thead>
+    <tr>
+      <th>عنوان</th>
+      <th>وضعیت</th>
+      <th>اولویت</th>
+      <th>سررسید</th>
+      <th>عملیات</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for task in tasks %}
+      <tr>
+        <td>{{ task.title }}</td>
+        <td>{{ task.get_status_display }}</td>
+        <td>{{ task.get_priority_display }}</td>
+        <td>{{ task.due_date|date:"Y-m-d H:i" }}</td>
+        <td>
+          <a href="{% url 'tasks:edit' task.id %}" class="btn btn-sm btn-warning">ویرایش</a>
+
+          <form action="{% url 'tasks:delete' task.id %}" method="post" style="display:inline;">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-sm btn-danger"
+                    onclick="return confirm('آیا از حذف این وظیفه مطمئن هستید؟');">
+              حذف
+            </button>
+          </form>
+
+          <form action="{% url 'tasks:toggle' task.id %}" method="post" style="display:inline;">
+            {% csrf_token %}
+            {% if task.status != 'done' %}
+              <button type="submit" class="btn btn-sm btn-success">انجام شد</button>
+            {% else %}
+              <button type="submit" class="btn btn-sm btn-secondary">لغو انجام</button>
+            {% endif %}
+          </form>
+        </td>
+      </tr>
+    {% empty %}
+      <tr>
+        <td colspan="5" class="text-center">هیچ وظیفه‌ای پیدا نشد</td>
+      </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

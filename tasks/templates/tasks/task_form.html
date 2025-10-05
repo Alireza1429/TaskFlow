@@ -1,0 +1,44 @@
+{% extends 'tasks/base.html' %}
+
+{% block content %}
+<div class="row">
+  <div class="col-md-8 offset-md-2">
+    <h3>{% if form.instance.pk %}ویرایش وظیفه{% else %}افزودن وظیفه{% endif %}</h3>
+    <form method="post">
+      {% csrf_token %}
+      {{ form.non_field_errors }}
+      <div class="mb-3">
+        <label class="form-label">عنوان</label>
+        {{ form.title }}
+        {{ form.title.errors }}
+      </div>
+      <div class="mb-3">
+        <label class="form-label">توضیحات</label>
+        {{ form.description }}
+        {{ form.description.errors }}
+      </div>
+      <div class="mb-3">
+        <label class="form-label">وضعیت</label>
+        {{ form.status }}
+        {{ form.status.errors }}
+      </div>
+      <div class="mb-3">
+        <label class="form-label">اولویت</label>
+        {{ form.priority }}
+        {{ form.priority.errors }}
+      </div>
+      <div class="mb-3">
+        <label class="form-label">تاریخ سررسید</label>
+        {{ form.due_date }}
+        {{ form.due_date.errors }}
+      </div>
+      <div class="mb-3 form-check">
+        {{ form.notify }}
+        <label class="form-check-label">اعلان فعال باشد</label>
+      </div>
+      <button class="btn btn-primary" type="submit">{% if form.instance.pk %}ویرایش{% else %}افزودن{% endif %}</button>
+      <a href="{% url 'tasks:list' %}" class="btn btn-secondary">بازگشت</a>
+    </form>
+  </div>
+</div>
+{% endblock %}
